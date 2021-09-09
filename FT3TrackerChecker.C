@@ -139,7 +139,12 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
     kFT3TrackPtResolutionPtEta,
     kFT3TrackInvPtResolutionPtEta,
     kFT3TrackInvQPtResolutionPtEta,
-    kFT3TrackInvQPtPullPtEta
+    kFT3TrackInvQPtPullPtEta,
+    kFT3TrackXPullPtEta,
+    kFT3TrackYPullPtEta,
+    kFT3TrackPhiPullPtEta,
+    kFT3TrackTanlPullPtEta,
+    kFT3TrackReducedChi2PtEta
   };
 
   std::map<int, const char*> TH3Names{
@@ -148,23 +153,38 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
     {kFT3TrackPtResolutionPtEta, "FT3TrackPtResolutionPtEta"},
     {kFT3TrackInvPtResolutionPtEta, "FT3TrackInvPtResolutionPtEta"},
     {kFT3TrackInvQPtResolutionPtEta, "FT3TrackInvQPtResolutionPtEta"},
-    {kFT3TrackInvQPtPullPtEta, "FT3TrackInvQPtPullPtEta"}};
+    {kFT3TrackXPullPtEta, "FT3TrackXPullPtEta"},
+    {kFT3TrackYPullPtEta, "FT3TrackYPullPtEta"},
+    {kFT3TrackPhiPullPtEta, "FT3TrackPhiPullPtEta"},
+    {kFT3TrackTanlPullPtEta, "FT3TrackTanlPullPtEta"},
+    {kFT3TrackInvQPtPullPtEta, "FT3TrackInvQPtPullPtEta"},
+    {kFT3TrackReducedChi2PtEta, "FT3TrackReducedChi2PtEta"}};
   //
   std::map<int, const char*> TH3Titles{
     {kFT3TrackDeltaXVertexPtEta, "FT3TrackDeltaXVertexPtEta"},
     {kFT3TrackDeltaYVertexPtEta, "FT3TrackDeltaYVertexPtEta"},
     {kFT3TrackPtResolutionPtEta, "FT3TrackPtResolutionPtEta"},
+    {kFT3TrackXPullPtEta, "FT3TrackXPullPtEta;p_t;\\eta;(\\Delta X)/\\sigma_{X}"},
+    {kFT3TrackYPullPtEta, "FT3TrackYPullPtEta;p_t;\\eta;(\\Delta Y)/\\sigma_{Y}"},
+    {kFT3TrackPhiPullPtEta, "FT3TrackPhiPullPtEta;p_t;\\eta;(\\Delta \\phi)/\\sigma_{\\phi}"},
+    {kFT3TrackTanlPullPtEta, "FT3TrackTanlPullPtEta;p_t;\\eta;(\\Delta tan\\lambda)/\\sigma_{tan\\lambda}"},
     {kFT3TrackInvQPtPullPtEta, "FT3TrackInvQPtPullPtEta"},
     {kFT3TrackInvQPtResolutionPtEta, "FT3TrackInvQPtResolutionPtEta"},
-    {kFT3TrackInvPtResolutionPtEta, "FT3TrackInvPtResolutionPtEta"}};
+    {kFT3TrackInvPtResolutionPtEta, "FT3TrackInvPtResolutionPtEta"},
+    {kFT3TrackReducedChi2PtEta, "FT3TrackReducedChi2PtEta;p_t;\\eta;Chi2/ Degrees of Freedom"}};
 
   std::map<int, std::array<double, 9>> TH3Binning{
     {kFT3TrackDeltaYVertexPtEta, {105, 0, 21, 62, 1.7, 4.5, 2e4, -1e4, 1e4}},
-    {kFT3TrackDeltaXVertexPtEta, {105, 0, 21, 62, 1.7, 4.5, 2e4, -1e4, 14}},
+    {kFT3TrackDeltaXVertexPtEta, {105, 0, 21, 62, 1.7, 4.5, 2e4, -1e4, 1e4}},
     {kFT3TrackPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 1000, -2, 50}},
+    {kFT3TrackXPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, 0, 0}},
+    {kFT3TrackYPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, 0, 0}},
+    {kFT3TrackPhiPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, -5, 5}},
+    {kFT3TrackTanlPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, -5, 5}},
     {kFT3TrackInvQPtPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 200, -5, 5}},
     {kFT3TrackInvQPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 2000, -2, 2}},
-    {kFT3TrackInvPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 2500, -5, 150}}};
+    {kFT3TrackInvPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 2500, -5, 150}},
+    {kFT3TrackReducedChi2PtEta, {105, 0, 21, 62, 1.7, 4.5, 50, 0, 100}}};
 
   std::map<int, const char*> TH3XaxisTitles{
     {kFT3TrackDeltaXVertexPtEta, "p_t"},
@@ -756,13 +776,19 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
         auto d_Phi = trackFT3.getPhi() - phi_MC;
         auto d_Charge = Q_fit - Q_MC;
         auto trackChi2 = trackFT3.getTrackChi2();
+        auto nClusters = trackFT3.getNumberOfPoints();
 
         TH3Histos[kFT3TrackDeltaXVertexPtEta]->Fill(Pt_MC, std::abs(eta_MC), 1e4 * dx);
         TH3Histos[kFT3TrackDeltaYVertexPtEta]->Fill(Pt_MC, std::abs(eta_MC), 1e4 * dy);
         TH3Histos[kFT3TrackPtResolutionPtEta]->Fill(Pt_MC, std::abs(eta_MC), (Pt_fit - Pt_MC) / Pt_MC);
+        TH3Histos[kFT3TrackXPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), dx / sqrt(trackFT3.getCovariances()(0, 0)));
+        TH3Histos[kFT3TrackYPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), dy / sqrt(trackFT3.getCovariances()(1, 1)));
+        TH3Histos[kFT3TrackPhiPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_Phi / sqrt(trackFT3.getCovariances()(2, 2)));
+        TH3Histos[kFT3TrackTanlPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_tanl / sqrt(trackFT3.getCovariances()(3, 3)));
         TH3Histos[kFT3TrackInvQPtPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_invQPt / sqrt(trackFT3.getCovariances()(4, 4)));
         TH3Histos[kFT3TrackInvPtResolutionPtEta]->Fill(Pt_MC, std::abs(eta_MC), (1.0 / Pt_fit - 1.0 / Pt_MC) * Pt_MC);
         TH3Histos[kFT3TrackInvQPtResolutionPtEta]->Fill(Pt_MC, std::abs(eta_MC), (invQPt_Fit - invQPt_MC) / invQPt_MC);
+        TH3Histos[kFT3TrackReducedChi2PtEta]->Fill(Pt_MC, std::abs(eta_MC), trackChi2 / (2*nClusters - 5)); // 5: number of fitting parameters
 
         TH1Histos[kFT3TracksP]->Fill(trackFT3.getP());
         TH1Histos[kFT3TrackDeltaTanl]->Fill(d_tanl);

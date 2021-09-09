@@ -24,10 +24,16 @@ using SMatrix55Sym = ROOT::Math::SMatrix<double, 5, 5, ROOT::Math::MatRepSym<dou
 using o2::ft3::FT3Track;
 
 enum TH3HistosCodes {
-  kFT3TrackDeltaXVertexPtEta = 0,
-  kFT3TrackDeltaYVertexPtEta = 1,
-  kFT3TrackInvQPtResolutionPtEta = 2,
-  kFT3TrackInvQPtPullPtEta = 3
+  kFT3TrackDeltaXVertexPtEta,
+  kFT3TrackDeltaYVertexPtEta,
+  kFT3TrackInvQPtResolutionPtEta,
+  kFT3TrackInvQPtPullPtEta,
+  kFT3TrackXPullPtEta,
+  kFT3TrackYPullPtEta,
+  kFT3TrackPhiPullPtEta,
+  kFT3TrackTanlPullPtEta,
+  kFT3TrackPhi2PullPtEta,
+  kFT3TrackReducedChi2PtEta
 };
 
 bool DEBUG_VERBOSE = !true;
@@ -43,6 +49,7 @@ void printCanvas(TCanvas* c, const char* filename);
 void exportHisto(TH2F* histo, const char* filename);
 void exportHisto(TH1F* histo, const char* filename);
 void setSeedCovariances(FT3Track& track);
+void th2Hists_EtaPt(string name, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value);
 
 void simFwdTracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, float etaMax, float zField, std::vector<float> zPositionsVec, std::vector<float> layResVec, TTree* trkDBGTree, std::vector<std::unique_ptr<TH3F>>& TH3Histos);
 void simFT3Tracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, float etaMax, float zField, TTree* trkDBGTree, std::vector<std::unique_ptr<TH3F>>& TH3Histos);
@@ -55,7 +62,7 @@ float pixelPitch;
 float clSigma;
 bool enableClusterSmearing;
 
-void FwdTrackerDebugger(size_t nTracks = 1000,
+void FwdTrackerDebugger(size_t nTracks = 20000,
                         float zField = -5.0,
                         float clSigma_ = 8.44e-4, //~( o2::itsmft::SegmentationAlpide::PitchCol / std::sqrt(12))
                         bool enableClusterSmearing_ = true,
@@ -93,19 +100,39 @@ void FwdTrackerDebugger(size_t nTracks = 1000,
     {kFT3TrackDeltaXVertexPtEta, "FT3DBGTrackDeltaXVertexPtEta"},
     {kFT3TrackDeltaYVertexPtEta, "FT3DBGTrackDeltaYVertexPtEta"},
     {kFT3TrackInvQPtResolutionPtEta, "FT3DBGTrackInvQPtResolutionPtEta"},
-    {kFT3TrackInvQPtPullPtEta, "FT3DBGTrackInvQPtPullPtEta"}};
+    {kFT3TrackInvQPtPullPtEta, "FT3DBGTrackInvQPtPullPtEta"},
+    {kFT3TrackXPullPtEta, "FT3DBGTrackXPullPtEta"},
+    {kFT3TrackYPullPtEta, "FT3DBGTrackYPullPtEta"},
+    {kFT3TrackPhiPullPtEta, "FT3DBGPhiPullPtEta"},
+    {kFT3TrackPhi2PullPtEta, "FT3DBGPhi2PullPtEta"},
+    {kFT3TrackTanlPullPtEta, "FT3DBGTrackTanlPullPtEta"},
+    {kFT3TrackInvQPtPullPtEta, "FT3DBGTrackInvQPtPullPtEta"},
+    {kFT3TrackReducedChi2PtEta, "FT3TrackReducedChi2PtEta"}};
 
   std::map<int, const char*> TH3Titles{
     {kFT3TrackDeltaXVertexPtEta, "FT3DBGTrackDeltaXVertexPtEta"},
     {kFT3TrackDeltaYVertexPtEta, "FT3DBGTrackDeltaYVertexPtEta"},
+    {kFT3TrackInvQPtResolutionPtEta, "FT3DBGTrackInvQPtResolutionPtEta;P_t;\\eta;Res Q/pt"},
     {kFT3TrackInvQPtPullPtEta, "FT3DBGTrackInvQPtPullPtEta"},
-    {kFT3TrackInvQPtResolutionPtEta, "FT3DBGTrackInvQPtResolutionPtEta"}};
+    {kFT3TrackXPullPtEta, "FT3DBGTrackXPullPtEta;p_t;\\eta;(\\Delta x)/\\sigma_{x}"},
+    {kFT3TrackYPullPtEta, "FT3DBGTrackYPullPtEta;p_t;\\eta;(\\Delta y)/\\sigma_{y}"},
+    {kFT3TrackPhiPullPtEta, "FT3DBGTrackPhiPullPtEta;P_t;\\eta;(\\Delta \\phi)/\\sigma_{\\phi}"},
+      {kFT3TrackPhi2PullPtEta, "FT3DBGPhi2PullPtEta;p_t;\\eta;(\\Delta Phi2)/\\sigma_{Phi}"},
+    {kFT3TrackTanlPullPtEta, "FT3DBGTrackTanlPullPtEta;P_t;\\eta;(\\Delta tan\\lambda)/\\sigma_{tan\\lambda}"},
+    {kFT3TrackInvQPtPullPtEta, "FT3DBGTrackInvQPtPullPtEta;P_t;\\eta;(\\Delta q/pt)/\\sigma_{q/pt}"},
+    {kFT3TrackReducedChi2PtEta, "FT3DBGTrackReducedChi2PtEta;P_t;\\eta;\\Reduced Chi2"}};
 
   std::map<int, std::array<double, 9>> TH3Binning{
-    {kFT3TrackDeltaXVertexPtEta, {20, 0, 10, 84, 1.7, 4.5, 500, -500, 500}},
+    {kFT3TrackDeltaXVertexPtEta, {50, 0, 10, 84, 1.7, 4.5, 500, -500, 500}},
     {kFT3TrackDeltaYVertexPtEta, {50, 0, 10, 84, 1.7, 4.5, 500, -500, 500}},
-    {kFT3TrackInvQPtPullPtEta, {200, 0, 20, 84, 1.7, 4.5, 200, -5, 5}},
-    {kFT3TrackInvQPtResolutionPtEta, {200, 0, 20, 84, 1.7, 4.5, 100, -1, 1}}};
+    {kFT3TrackInvQPtResolutionPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -1, 1}},
+    {kFT3TrackXPullPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -10, 10}},
+    {kFT3TrackYPullPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -10, 10}},
+    {kFT3TrackPhiPullPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -10, 10}},
+    {kFT3TrackPhi2PullPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, -10, 50}},
+    {kFT3TrackTanlPullPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -10, 10}},
+    {kFT3TrackInvQPtPullPtEta, {200, 0, 20, 28, 1.7, 4.5, 100, -10, 10}},
+    {kFT3TrackReducedChi2PtEta, {200, 0, 20, 28, 1.7, 4.5, 50, -0.5, 30}}};
 
   std::map<int, const char*> TH3XaxisTitles{
     {kFT3TrackDeltaXVertexPtEta, "p_t"},
@@ -129,7 +156,7 @@ void FwdTrackerDebugger(size_t nTracks = 1000,
 
   std::cout << " nTH3Histos = " << nTH3Histos << std::endl;
   //for (auto& h : TH3Histos) {
-  for (auto n3Histo = 0; n3Histo < 4; n3Histo++) {
+  for (auto n3Histo = 0; n3Histo < nTH3Histos; n3Histo++) {
 
     TH3Histos.emplace_back(std::make_unique<TH3F>(TH3Names[n3Histo], TH3Titles[n3Histo],
                                                   (int)TH3Binning[n3Histo][0],
@@ -175,6 +202,14 @@ void simFT3Tracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, flo
 void simFwdTracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, float etaMax, float zField, std::vector<float> zPositionsVec, std::vector<float> layResVec, TTree* trkDBGTree, std::vector<std::unique_ptr<TH3F>>& TH3Histos)
 {
 
+//just a quick chi2 histogram
+  TH1D * chi_hist = new TH1D("h1_chi2","chi2",100,0,50);
+    chi_hist->SetFillColor(kRed);
+    chi_hist->SetFillStyle(3005);
+  TH1D * chiRed_hist = new TH1D("h1_redu_chi2","reduced_chi2",100,0,6);
+    chiRed_hist->SetFillColor(kRed);
+    chiRed_hist->SetFillStyle(3005);
+
   for (size_t i = 0; i < nTracks; i++) {
     if (i > 10)
       fitter.mVerbose = !true;
@@ -219,7 +254,7 @@ void simFwdTracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, flo
 
     fitter.initTrack(ft3ProbeTr);
     setSeedCovariances(ft3ProbeTr);
-    //fitter.MinuitFit(ft3ProbeTr);
+//    fitter.MinuitFit(ft3ProbeTr); 
     fitter.fit(ft3ProbeTr);
     if (DEBUG_qpt)
       std::cout << "Track " << i << ": \n    q/pt_MC = " << MCTrack.getInvQPt() << "\n    q/pt_Seed = " << ft3ProbeTr.getInvQPtSeed() << "\n    q/pt_fit = " << ft3ProbeTr.getInvQPt() << std::endl;
@@ -235,50 +270,145 @@ void simFwdTracks(size_t nTracks, float ptMinCut, float ptMax, float etaMin, flo
     auto invQPt_MC = MCTrack_.getInvQPt();
     auto Pt_MC = MCTrack_.getPt();
     auto eta_MC = MCTrack_.getEta();
+    auto phi_MC = MCTrack_.getPhi();
+    auto tanl_MC = MCTrack_.getTanl();
 
     auto dx = ft3ProbeTr.getX() - vx_MC;
     auto dy = ft3ProbeTr.getY() - vy_MC;
     auto invQPt_Fit = ft3ProbeTr.getInvQPt();
     auto d_invQPt = invQPt_Fit - invQPt_MC;
+    auto d_Phi = ft3ProbeTr.getPhi() - phi_MC;
+    auto d_tanl = ft3ProbeTr.getTanl() - tanl_MC;
+    auto trackChi2 = ft3ProbeTr.getTrackChi2();
+    auto nClusters = ft3ProbeTr.getNumberOfPoints();
 
     TH3Histos[kFT3TrackDeltaXVertexPtEta]->Fill(Pt_MC, std::abs(eta_MC), 1e4 * dx);
     TH3Histos[kFT3TrackDeltaYVertexPtEta]->Fill(Pt_MC, std::abs(eta_MC), 1e4 * dy);
-    TH3Histos[kFT3TrackInvQPtPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_invQPt / sqrt(ft3ProbeTr.getCovariances()(4, 4)));
     TH3Histos[kFT3TrackInvQPtResolutionPtEta]->Fill(Pt_MC, std::abs(eta_MC), (invQPt_Fit - invQPt_MC) / invQPt_MC);
+    TH3Histos[kFT3TrackXPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), dx / sqrt(ft3ProbeTr.getCovariances()(0, 0)));
+    TH3Histos[kFT3TrackYPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), dy / sqrt(ft3ProbeTr.getCovariances()(1, 1)));
+    TH3Histos[kFT3TrackPhiPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_Phi / sqrt(ft3ProbeTr.getCovariances()(2, 2)));
+    TH3Histos[kFT3TrackTanlPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_tanl / sqrt(ft3ProbeTr.getCovariances()(3, 3)));
+    TH3Histos[kFT3TrackInvQPtPullPtEta]->Fill(Pt_MC, std::abs(eta_MC), d_invQPt / sqrt(ft3ProbeTr.getCovariances()(4, 4)));
+    TH3Histos[kFT3TrackReducedChi2PtEta]->Fill(Pt_MC, std::abs(eta_MC), trackChi2 / (2*nClusters - 5)); // 5: number of fitting paramet
+    chi_hist->Fill(trackChi2);
+    chiRed_hist->Fill(trackChi2/(2*nClusters - 5));
   }
+    chi_hist->Draw();
+    chiRed_hist->Draw();
 
   // InvPtResolution vs eta MC Debuger
-  auto CPtResInvPt = new TCanvas("PtResVsPt", "PtResVsPt", 1080, 1080);
-
-  auto& FT3TrackInvQPtResolutionPtEtaDBG = TH3Histos[kFT3TrackInvQPtPullPtEta];
+  auto& FT3TrackInvQPtResolutionPtEtaDBG = TH3Histos[kFT3TrackInvQPtResolutionPtEta];
   FT3TrackInvQPtResolutionPtEtaDBG->GetYaxis()->SetRange(0, 0);
 
   int marker = kFullCircle;
-  std::vector<double> ptList({1, 9.});
-  double ptWindow = 1.2;
+  std::vector<double> ptList({1, 5, 9.});
+  double ptWindow = 1.;
+  std::vector<double> etaList({2., 3., 3.8});
+  double etaWindow = 0.2;
 
-  for (auto ptmin : ptList) {
-    auto ptmax = ptmin + ptWindow;
+/* /last argument is a string: _1 for mean, _2 for std dev
+  th2Hists_EtaPt("InvQPtResVsEta", TH3Histos[kFT3TrackInvQPtResolutionPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("InvQPtResVsPt", TH3Histos[kFT3TrackInvQPtResolutionPtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetXaxis()->SetRangeUser(0, 0);
 
-    FT3TrackInvQPtResolutionPtEtaDBG->GetXaxis()->SetRangeUser(ptmin, ptmax);
+  th2Hists_EtaPt("Redu_Chi2VsEta", TH3Histos[kFT3TrackReducedChi2PtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("Redu_Chi2VsPt", TH3Histos[kFT3TrackReducedChi2PtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackReducedChi2PtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackReducedChi2PtEta]->GetXaxis()->SetRangeUser(0, 0);
 
-    auto title = Form("_%1.2f_%1.2f_yz", ptmin, ptmax);
-    auto aDBG = (TH2F*)FT3TrackInvQPtResolutionPtEtaDBG->Project3D(title);
-    aDBG->GetXaxis()->SetRangeUser(0, 0);
+  th2Hists_EtaPt("PhiPullVsEta", TH3Histos[kFT3TrackPhiPullPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("PhiPullVsPt", TH3Histos[kFT3TrackPhiPullPtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackPhiPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackPhiPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
 
-    aDBG->FitSlicesX(0, 0, -1, 1);
-    auto th2InvPtResolutionEtaDBG = (TH1F*)gDirectory->Get((std::string(aDBG->GetName()) + std::string("_2")).c_str());
-    th2InvPtResolutionEtaDBG->SetTitle(Form("MC_DBG: %1.2f < p_t < %1.2f (w.o.MCS)", ptmin, ptmax));
-    th2InvPtResolutionEtaDBG->SetMarkerStyle(marker++);
-    th2InvPtResolutionEtaDBG->SetLineStyle(kDashed);
-    th2InvPtResolutionEtaDBG->SetStats(0);
-    th2InvPtResolutionEtaDBG->Draw("PLC PMC same");
+  th2Hists_EtaPt("TanlPullVsEta", TH3Histos[kFT3TrackTanlPullPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("TanlPullVsPt", TH3Histos[kFT3TrackTanlPullPtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackTanlPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackTanlPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  th2Hists_EtaPt("DeltaXVertexVsEta",TH3Histos[kFT3TrackDeltaXVertexPtEta],ptList, ptWindow, "_2");
+  th2Hists_EtaPt("DeltaXVertexVsPt",TH3Histos[kFT3TrackDeltaXVertexPtEta],etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  th2Hists_EtaPt("DeltaYVertexVsEta",TH3Histos[kFT3TrackDeltaYVertexPtEta],ptList, ptWindow, "_2");
+  th2Hists_EtaPt("DeltaYVertexVsPt",TH3Histos[kFT3TrackDeltaYVertexPtEta],etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  th2Hists_EtaPt("InvQPtPullVsEta", TH3Histos[kFT3TrackInvQPtPullPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("InvQPtPullVsPt", TH3Histos[kFT3TrackInvQPtPullPtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackInvQPtPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackInvQPtPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  th2Hists_EtaPt("XPullVsEta", TH3Histos[kFT3TrackXPullPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("XPullVsPt", TH3Histos[kFT3TrackXPullPtEta], etaList, etaWindow, "_2");
+  TH3Histos[kFT3TrackXPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+  TH3Histos[kFT3TrackXPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  th2Hists_EtaPt("YPullVsEta", TH3Histos[kFT3TrackYPullPtEta], ptList, ptWindow, "_2");
+  th2Hists_EtaPt("YPullVsPt", TH3Histos[kFT3TrackYPullPtEta], etaList, etaWindow, "_2");
+*/
+}
+
+void th2Hists_EtaPt(string name, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value)
+{
+  auto canva = new TCanvas(name.c_str(), name.c_str(), 1080, 1080);
+  int marker = kFullCircle;
+  int colormarker = 1;
+
+  Hist3DDBG->GetYaxis()->SetRange(0, 0);
+  Hist3DDBG->GetXaxis()->SetRange(0, 0);
+  if (name.find("VsEta")<50) {
+    for (auto ptmin : list) {
+      auto ptmax = ptmin + window;
+      Hist3DDBG->GetXaxis()->SetRangeUser(ptmin, ptmax);
+
+      auto title = Form("_%1.2f_%1.2f_yz", ptmin, ptmax);
+      auto aDBG = (TH2F*)Hist3DDBG->Project3D(title);
+//      aDBG->GetXaxis()->SetRangeUser(0, 0);
+
+      aDBG->FitSlicesX(0, 0, -1, 1);
+      auto th2DBG = (TH1F*)gDirectory->Get((std::string(aDBG->GetName()) + value).c_str());
+      th2DBG->SetTitle(Form("MC_DBG: %1.2f < p_t < %1.2f (w.o.MCS)", ptmin, ptmax));
+      th2DBG->SetMarkerStyle(marker++);
+      th2DBG->SetMarkerColor(colormarker);
+      th2DBG->SetLineColorAlpha(colormarker++,0.0);
+      th2DBG->SetStats(0);
+      th2DBG->Draw("same");
+      Hist3DDBG->GetXaxis()->SetRangeUser(0, 0);
+    }
+  }else if (name.find("VsPt")<50) {
+    for (auto etamin:list) {
+      auto etamax = etamin + window;
+      Hist3DDBG->GetYaxis()->SetRangeUser(etamin, etamax);
+
+      auto title = Form("_%1.2f_%1.2f_xz", etamin, etamax);
+      auto aDBG = (TH2F*)Hist3DDBG->Project3D(title);
+//      aDBG->GetXaxis()->SetRangeUser(0, 0);
+
+      aDBG->FitSlicesX(0, 0, -1, 1);
+      auto th2DBG = (TH1F*)gDirectory->Get((std::string(aDBG->GetName()) + value).c_str());
+      th2DBG->SetTitle(Form("MC_DBG: %1.2f < \\eta < %1.2f (w.o.MCS)", etamin, etamax));
+      th2DBG->SetMarkerStyle(marker++);
+      th2DBG->SetMarkerColor(colormarker);
+      th2DBG->SetLineColorAlpha(colormarker++,0.0);
+      th2DBG->SetStats(0);
+      th2DBG->Draw("same");
+    }
+  } else {
+    cout << " SOMETHINGWENTWRONG! GOCHECKITOUT! "; exit(1);
   }
-  CPtResInvPt->BuildLegend();
-  CPtResInvPt->SetTicky();
-  CPtResInvPt->SetGridy();
-  CPtResInvPt->Write();
-  CPtResInvPt->Print("PtResVsPt.png");
+
+  
+  name += ".png";
+  canva->BuildLegend();
+  canva->SetTicky();
+  canva->SetGridy();
+  canva->Write();
+  canva->Print(name.c_str());
 }
 
 void setSeedCovariances(FT3Track& track)

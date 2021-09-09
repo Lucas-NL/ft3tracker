@@ -91,6 +91,7 @@ void ft3Tracker(Double_t clResolution = 8.44e-4, bool verbose = false) // clReso
         fitter.initTrack(track);
         setSeedCovariances(track);
         fitter.fit(track);
+//        fitter.MinuitFit(track);
         recoTracks->emplace_back(track);
         recoTrackIDs->emplace_back(trackID);
         if (fitter.mVerbose) {

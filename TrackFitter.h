@@ -61,6 +61,7 @@ class TrackFitter
   static std::vector<float, std::allocator<float>> PosZ;
   static std::vector<float, std::allocator<float>> ErrorsX;
   static std::vector<float, std::allocator<float>> ErrorsY;
+  static std::vector<Double_t> layersx2x0;
 
  private:
   bool computeCluster(FT3Track& track, int cluster);

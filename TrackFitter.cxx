@@ -228,7 +228,7 @@ bool TrackFitter::computeCluster(FT3Track& track, int cluster)
                 << track.getCovariances() << std::endl
                 << std::endl;
     }
-    track.addMCSEffect(1.0 * Layerx2X0);
+    track.addMCSEffect(1.0 , Layerx2X0);
 
     if (mVerbose) {
       std::cout << "  After MCS Effects II:  mLayersx2X0[cluster] = " << Layerx2X0 << std::endl;
@@ -243,7 +243,6 @@ bool TrackFitter::computeCluster(FT3Track& track, int cluster)
 //_________________________________________________________________________________________________
 void TrackFitter::MinuitFit(FT3Track& track)
 {
-  //std::ofstream log("MinuitFitter_Log");
   initTrack(track, 1);
 
   TrackFitter::PosX = track.getXCoordinates();
@@ -251,16 +250,35 @@ void TrackFitter::MinuitFit(FT3Track& track)
   TrackFitter::PosZ = track.getZCoordinates();
   TrackFitter::ErrorsX = track.getSigmasX2();
   TrackFitter::ErrorsY = track.getSigmasY2();
+//  TrackFitter::layersx2x0 = mLayersx2X0;
 
-  //log << " Track Coordinates: "<<std::endl;
+  int aux = 0;
+  bool debug_minuit = true;
+/*  if (debug_minuit) {
+    std::ofstream log("MinuitFitter_Log",std::ofstream::app);
+    log << " Track Coordinates: "<<std::endl;
+    for (auto a:TrackFitter::PosZ) {
+      log << " Z Pos: " << a << " X Pos: " << TrackFitter::PosX[aux] << " Y Pos: " << TrackFitter::PosY[aux] << endl;
+      aux ++;
+    }
+    log << " Track done. Number of clusters: "<< track.getNumberOfPoints() << " One more check (aux count): " << aux <<" \n "<<std::endl;
+  }
+*/
+
+
+  //    for (auto a:mLayersx2X0)
+//    log << " ****** layers " << a <<endl;
+// exit(0);
+
+//  exit(0);
   //log << " X = {"<< TrackFitter::PosX[0] << ", " <<TrackFitter::PosX[1] << ", " <<TrackFitter::PosX[2] << ", " <<TrackFitter::PosX[3] << ", " << TrackFitter::PosX[4] << "}" << std::endl;
   //log << " Y = {"<< TrackFitter::PosY[0] << ", " <<TrackFitter::PosY[1] << ", " <<TrackFitter::PosY[2] << ", " <<TrackFitter::PosY[3] << ", " << TrackFitter::PosY[4] << "}" << std::endl;
   //log << " Z = {"<< TrackFitter::PosZ[0] << ", " <<TrackFitter::PosZ[1] << ", " <<TrackFitter::PosZ[2] << ", " <<TrackFitter::PosZ[3] << ", " << TrackFitter::PosZ[4] << "}" << std::endl;
 
   TVirtualFitter::SetDefaultFitter("Minuit");
   TVirtualFitter* minuit = TVirtualFitter::Fitter(0, 5);
-  minuit->SetParameter(0, "X", track.getX(), 8.44e-4, -30, 30);
-  minuit->SetParameter(1, "Y", track.getY(), 8.44e-4, -40, 40);
+  minuit->SetParameter(0, "X", track.getX(), 8.44e-4, 0, 0);
+  minuit->SetParameter(1, "Y", track.getY(), 8.44e-4, 0, 0);
   minuit->SetParameter(2, "Phi", track.getPhi(), 0.0001, 0, 0);
   minuit->SetParameter(3, "Tanl", track.getTanl(), 0.0001, 0, 0);
   minuit->SetParameter(4, "invQPt", track.getInvQPt(), 0.0001, 0, 0);
@@ -284,11 +302,27 @@ void TrackFitter::MinuitFit(FT3Track& track)
   arglist[1] = 0.001; // tolerance
   minuit->ExecuteCommand("MIGRAD", arglist, 2);
 
+  if (debug_minuit) {
+    std::ofstream log("MinuitFitter_Log",std::ofstream::app);
+    log << " Inv Q/Pt comparasion: \n";
+    log << " Before fit \t\t After Fit(Minuit) \n";
+    log << " " << track.getInvQPt() << "\t\t"  << minuit->GetParameter(4) << endl;
+//    log << " X pos comparasion: \n";
+//    log << " Before fit \t\t After Fit(Minuit) \n";
+//    log << " " << track.getX() << "\t\t " << minuit->GetParameter(0) << endl;
+    log << " End of track comparasion\n " <<endl;
+  }
+//exit(0);
   //log << "\n\n/************** Minuit Fit *************/  " << std::endl;
 
   //for (int i = 0; i <= 4; ++i) {
   //log << minuit->GetParName(i) << " = " << minuit->GetParameter(i) << " +/- " << minuit->GetParError(i)<<std::endl;
   //}
+  double chi2, edm, errdef;
+  int nvpar, nparx;
+  minuit->GetStats(chi2,edm,errdef,nvpar,nparx);
+
+  track.setTrackChi2(chi2);
 
   track.setX(minuit->GetParameter(0));
   track.setY(minuit->GetParameter(1));
@@ -303,7 +337,13 @@ void TrackFitter::MinuitFit(FT3Track& track)
   mCovariances(3, 3) = minuit->GetParError(3);
   mCovariances(4, 4) = minuit->GetParError(4);
   track.setCovariances(mCovariances);
-  //  initTrack(track,0);
+/*
+    log << "   Track covariances after MCS update: \n"
+                << track.getCovariances() << std::endl
+                << std::endl;
+// exit(1);
+*/
+//  initTrack(track,0);
   //  fit(track);
 
   //  log << " Kalman: " << std::endl;
@@ -320,26 +360,180 @@ void myFitFcn(Int_t&, Double_t*, Double_t& fval, Double_t* p, Int_t)
   //   o2::track::TrackParFwd tempTrack;
   FT3Track tempTrack;
   auto fieldZ = -5.; //mBZField;
-  auto zPositionsMFT = TrackFitter::PosZ;
+  auto zPositionsTrack = TrackFitter::PosZ;
+  auto sigmaResXsq = TrackFitter::ErrorsX[0];
+  auto sigmaResYsq = TrackFitter::ErrorsY[0];
+  const int nhits = zPositionsTrack.size();
 
-  //std::cout<< " z position " << zPositionsMFT[0] <<std::endl; exit(1);
-  tempTrack.setZ(zPositionsMFT[0]);
+  double posX_array[nhits];
+  double posY_array[nhits];
+  for (int i = 0; i < nhits; i++) {
+    posX_array[i] = TrackFitter::PosX[i];
+    posY_array[i] = TrackFitter::PosY[i];
+  }
+
+  tempTrack.setZ(zPositionsTrack[0]);
   tempTrack.setX(p[0]);
   tempTrack.setY(p[1]);
   tempTrack.setPhi(p[2]);
   tempTrack.setTanl(p[3]);
   tempTrack.setInvQPt(p[4]);
-  auto i = 0;
 
-  for (auto z : zPositionsMFT) {
-    // Propagate to Z
-    tempTrack.propagateParamToZhelix(z, fieldZ);
-    tmp = (TrackFitter::PosX[i] - tempTrack.getX()) / TrackFitter::ErrorsX[i];
-    chi2 += tmp * tmp;
-    tmp = (TrackFitter::PosY[i] - tempTrack.getY()) / TrackFitter::ErrorsY[i];
-    chi2 += tmp * tmp;
-    i++;
+  auto Layerx2X0 = 0.01;//TrackFitter::layersx2x0[9];
+  auto csclambda = TMath::Abs(TMath::Sqrt(1 + tempTrack.getTanl() * tempTrack.getTanl()) / tempTrack.getTanl());
+  auto pathLengthOverX0 = Layerx2X0 * csclambda; //
+
+  //  Angular dispersion square of the track (variance) in a plane perpendicular to the trajectory
+  auto sigmathetasq = 0.0136 * tempTrack.getInverseMomentum();
+  sigmathetasq *= sigmathetasq * pathLengthOverX0;
+
+  // a will be the vector of paramters, a0, a1, a2, defined by the trajectory model
+  auto phi = tempTrack.getPhi();
+  auto tanl = tempTrack.getTanl();
+  auto invqpt = tempTrack.getInvQPt();
+
+  auto k = TMath::Abs(o2::constants::math::B2C * fieldZ);
+  auto Hz = std::copysign(1, fieldZ);
+
+  ROOT::Math::SVector<double,3>  ax;
+  ax[0] = tempTrack.getX();
+  ax[1] = TMath::Cos(phi) / tanl;
+  ax[2] = Hz * k * invqpt * TMath::Sin(phi) / ( tanl * tanl);
+
+  ROOT::Math::SVector<double,3>  ay;
+  ay[0] = tempTrack.getY();
+  ay[1] = TMath::Sin(phi) / tanl;
+  ay[2] = -Hz * k * invqpt * TMath::Cos(phi) / ( tanl * tanl);
+
+  if (nhits == 10) {
+    ROOT::Math::SMatrix<double, 10, 3> G_n3;
+    for (int n = 0; n < nhits; n ++) {
+      auto z = zPositionsTrack[n] - zPositionsTrack[0];
+      G_n3(n,0) = 1;
+      G_n3(n,1) = z;
+      G_n3(n,2) = z * z * 0.5;
+    }
+//    cout << " Printing 10x3 G matrix: \n" << G_n3 <<endl;
+    ROOT::Math::SMatrix<double,10,10,ROOT::Math::MatRepSym<double,10> > idM = ROOT::Math::SMatrixIdentity();
+    ROOT::Math::SMatrix<double,10,10,ROOT::Math::MatRepSym<double,10> > invCy;
+//    invCy = invCy * sigmaResYsq;
+    for (int m = 1; m < nhits; m++) {
+      for (int n = m; n < nhits; n++) {
+        for (int j = 0; j < m; j++) { // j from 0 to Min[n.m] - 1
+          invCy(m,n) += sigmathetasq * (zPositionsTrack[m] - zPositionsTrack[j]) * (zPositionsTrack[n] - zPositionsTrack[j]);
+        }
+      } // end columns loop
+    } //end of lines loop
+
+    auto invCx = invCy; //assuming sigmatheta is the same for Y and X
+    invCx += idM * sigmaResXsq;
+    invCy += idM * sigmaResYsq;
+    invCx.Invert();
+    invCy.Invert();
+
+    ROOT::Math::SVector<double, 10> xPositionsTrack(posX_array,10);
+    ROOT::Math::SVector<double, 10> yPositionsTrack(posY_array,10);
+
+    chi2 += ROOT::Math::Similarity ( (xPositionsTrack - G_n3 * ax), invCx);
+    chi2 += ROOT::Math::Similarity ( (yPositionsTrack - G_n3 * ay), invCy);
   }
+  else if (nhits == 9) {
+    ROOT::Math::SMatrix<double, 9, 3> G_n3;
+    for (int n = 0; n < nhits; n ++) {
+      auto z = zPositionsTrack[n] - zPositionsTrack[0];
+      G_n3(n,0) = 1;
+      G_n3(n,1) = z;
+      G_n3(n,2) = z * z * 0.5;
+    }
+//    cout << " Printing 9x3 G matrix: \n" << G_n3 <<endl;
+    ROOT::Math::SMatrix<double,9,9,ROOT::Math::MatRepSym<double,9> > idM = ROOT::Math::SMatrixIdentity();
+    ROOT::Math::SMatrix<double,9,9,ROOT::Math::MatRepSym<double,9> > invCy;
+//    invCy = invCy * sigmaResYsq;
+    for (int m = 1; m < nhits; m++) {
+      for (int n = m; n < nhits; n++) {
+        for (int j = 0; j < m; j++) { // j from 0 to Min[n.m] - 1
+          invCy(m,n) += sigmathetasq * (zPositionsTrack[m] - zPositionsTrack[j]) * (zPositionsTrack[n] - zPositionsTrack[j]);
+        }
+      } // end columns loop
+    } //end of lines loop
+
+    auto invCx = invCy; //assuming sigmatheta is the same for Y and X
+    invCx += idM * sigmaResXsq;
+    invCy += idM * sigmaResYsq;
+    invCx.Invert();
+    invCy.Invert();
+
+    ROOT::Math::SVector<double, 9> xPositionsTrack(posX_array,9);
+    ROOT::Math::SVector<double, 9> yPositionsTrack(posY_array,9);
+
+    chi2 += ROOT::Math::Similarity ( (xPositionsTrack - G_n3 * ax), invCx);
+    chi2 += ROOT::Math::Similarity ( (yPositionsTrack - G_n3 * ay), invCy);
+  }
+  else if (nhits == 8) {
+    ROOT::Math::SMatrix<double, 8, 3> G_n3;
+    for (int n = 0; n < nhits; n ++) {
+      auto z = zPositionsTrack[n] - zPositionsTrack[0];
+      G_n3(n,0) = 1;
+      G_n3(n,1) = z;
+      G_n3(n,2) = z * z * 0.5;
+    }
+//    cout << " Printing 8x3 G matrix: \n" << G_n3 <<endl;
+    ROOT::Math::SMatrix<double,8,8,ROOT::Math::MatRepSym<double,8> > idM = ROOT::Math::SMatrixIdentity();
+    ROOT::Math::SMatrix<double,8,8,ROOT::Math::MatRepSym<double,8> > invCy;
+//    invCy = invCy * sigmaResYsq;
+    for (int m = 1; m < nhits; m++) {
+      for (int n = m; n < nhits; n++) {
+        for (int j = 0; j < m; j++) { // j from 0 to Min[n.m] - 1
+          invCy(m,n) += sigmathetasq * (zPositionsTrack[m] - zPositionsTrack[j]) * (zPositionsTrack[n] - zPositionsTrack[j]);
+        }
+      } // end columns loop
+    } //end of lines loop
+
+    auto invCx = invCy; //assuming sigmatheta is the same for Y and X
+    invCx += idM * sigmaResXsq;
+    invCy += idM * sigmaResYsq;
+    invCx.Invert();
+    invCy.Invert();
+
+    ROOT::Math::SVector<double, 8> xPositionsTrack(posX_array,8);
+    ROOT::Math::SVector<double, 8> yPositionsTrack(posY_array,8);
+
+    chi2 += ROOT::Math::Similarity ( (xPositionsTrack - G_n3 * ax), invCx);
+    chi2 += ROOT::Math::Similarity ( (yPositionsTrack - G_n3 * ay), invCy);
+  }
+  else if (nhits == 7) {
+    ROOT::Math::SMatrix<double, 7, 3> G_n3;
+    for (int n = 0; n < nhits; n ++) {
+      auto z = zPositionsTrack[n] - zPositionsTrack[0];
+      G_n3(n,0) = 1;
+      G_n3(n,1) = z;
+      G_n3(n,2) = z * z * 0.5;
+    }
+//cout << " Printing 7x3 G matrix: \n" << G_n3 <<endl;
+    ROOT::Math::SMatrix<double,7,7,ROOT::Math::MatRepSym<double,7> > idM = ROOT::Math::SMatrixIdentity();
+    ROOT::Math::SMatrix<double,7,7,ROOT::Math::MatRepSym<double,7> > invCy;
+//    invCy = invCy * sigmaResYsq;
+    for (int m = 1; m < nhits; m++) {
+      for (int n = m; n < nhits; n++) {
+        for (int j = 0; j < m; j++) { // j from 0 to Min[n.m] - 1
+          invCy(m,n) += sigmathetasq * (zPositionsTrack[m] - zPositionsTrack[j]) * (zPositionsTrack[n] - zPositionsTrack[j]);
+        }
+      } // end columns loop
+    } //end of lines loop
+
+    auto invCx = invCy;
+    invCx += idM * sigmaResXsq;
+    invCy += idM * sigmaResYsq;
+    invCx.Invert();
+    invCy.Invert();
+
+    ROOT::Math::SVector<double, 7> xPositionsTrack(posX_array,7);
+    ROOT::Math::SVector<double, 7> yPositionsTrack(posY_array,7);
+
+    chi2 += ROOT::Math::Similarity ( (xPositionsTrack - G_n3 * ax), invCx);
+    chi2 += ROOT::Math::Similarity ( (yPositionsTrack - G_n3 * ay), invCy);
+  }
+
   fval = chi2;
 }
 
