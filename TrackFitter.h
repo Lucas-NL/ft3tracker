@@ -55,13 +55,13 @@ class TrackFitter
   static constexpr double getMaxChi2() { return SMaxChi2; }
   bool mVerbose = false;
 
-  //Vectors for Minuit Fitter
+  //Vectors for Minuit Fitter #TODO create functions to manage these vetors
   static std::vector<float, std::allocator<float>> PosX;
   static std::vector<float, std::allocator<float>> PosY;
   static std::vector<float, std::allocator<float>> PosZ;
   static std::vector<float, std::allocator<float>> ErrorsX;
   static std::vector<float, std::allocator<float>> ErrorsY;
-  static std::vector<Double_t> layersx2x0;
+  static double sigmathetasq;
 
  private:
   bool computeCluster(FT3Track& track, int cluster);
@@ -88,6 +88,7 @@ std::vector<float, std::allocator<float>> TrackFitter::PosY;
 std::vector<float, std::allocator<float>> TrackFitter::PosZ;
 std::vector<float, std::allocator<float>> TrackFitter::ErrorsX;
 std::vector<float, std::allocator<float>> TrackFitter::ErrorsY;
+double TrackFitter::sigmathetasq = 0;
 
 } // namespace ft3
 } // namespace o2

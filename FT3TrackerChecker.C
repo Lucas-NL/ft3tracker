@@ -120,14 +120,14 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
   gStyle->SetPadTickX(1);
   gStyle->SetPadTickY(1);
   gStyle->SetPadLeftMargin(0.15);
-  gStyle->SetHistLineWidth(3);
+  gStyle->SetHistLineWidth(2);
   gStyle->SetHistLineColor(kRed);
   gStyle->SetFuncWidth(3);
   gStyle->SetFuncColor(kGreen);
   gStyle->SetLineWidth(3);
-  gStyle->SetLabelSize(0.06, "xyz");
-  gStyle->SetLabelOffset(0.01, "y");
-  gStyle->SetTitleSize(0.06, "xyz");
+//  gStyle->SetLabelSize(0.06, "xyz");
+//  gStyle->SetLabelOffset(0.01, "y");
+  gStyle->SetTitleSize(0.04, "xyz");
   gStyle->SetTitleSize(0.08, "o");
   gStyle->SetTitleOffset(.95, "Y");
   gStyle->SetTitleFillColor(10);
@@ -164,33 +164,37 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
     {kFT3TrackDeltaXVertexPtEta, "FT3TrackDeltaXVertexPtEta"},
     {kFT3TrackDeltaYVertexPtEta, "FT3TrackDeltaYVertexPtEta"},
     {kFT3TrackPtResolutionPtEta, "FT3TrackPtResolutionPtEta"},
-    {kFT3TrackXPullPtEta, "FT3TrackXPullPtEta;p_t;\\eta;(\\Delta X)/\\sigma_{X}"},
-    {kFT3TrackYPullPtEta, "FT3TrackYPullPtEta;p_t;\\eta;(\\Delta Y)/\\sigma_{Y}"},
-    {kFT3TrackPhiPullPtEta, "FT3TrackPhiPullPtEta;p_t;\\eta;(\\Delta \\phi)/\\sigma_{\\phi}"},
-    {kFT3TrackTanlPullPtEta, "FT3TrackTanlPullPtEta;p_t;\\eta;(\\Delta tan\\lambda)/\\sigma_{tan\\lambda}"},
+    {kFT3TrackXPullPtEta, "FT3TrackXPullPtEta"},
+    {kFT3TrackYPullPtEta, "FT3TrackYPullPtEta"},
+    {kFT3TrackPhiPullPtEta, "FT3TrackPhiPullPtEta"},
+    {kFT3TrackTanlPullPtEta, "FT3TrackTanlPullPtEta"},
     {kFT3TrackInvQPtPullPtEta, "FT3TrackInvQPtPullPtEta"},
     {kFT3TrackInvQPtResolutionPtEta, "FT3TrackInvQPtResolutionPtEta"},
     {kFT3TrackInvPtResolutionPtEta, "FT3TrackInvPtResolutionPtEta"},
-    {kFT3TrackReducedChi2PtEta, "FT3TrackReducedChi2PtEta;p_t;\\eta;Chi2/ Degrees of Freedom"}};
+    {kFT3TrackReducedChi2PtEta, "FT3TrackReducedChi2PtEta"}};
 
   std::map<int, std::array<double, 9>> TH3Binning{
-    {kFT3TrackDeltaYVertexPtEta, {105, 0, 21, 62, 1.7, 4.5, 2e4, -1e4, 1e4}},
-    {kFT3TrackDeltaXVertexPtEta, {105, 0, 21, 62, 1.7, 4.5, 2e4, -1e4, 1e4}},
-    {kFT3TrackPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 1000, -2, 50}},
-    {kFT3TrackXPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, 0, 0}},
-    {kFT3TrackYPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, 0, 0}},
-    {kFT3TrackPhiPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, -5, 5}},
-    {kFT3TrackTanlPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 100, -5, 5}},
-    {kFT3TrackInvQPtPullPtEta, {105, 0, 21, 62, 1.7, 4.5, 200, -5, 5}},
-    {kFT3TrackInvQPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 2000, -2, 2}},
-    {kFT3TrackInvPtResolutionPtEta, {105, 0, 21, 62, 1.7, 4.5, 2500, -5, 150}},
-    {kFT3TrackReducedChi2PtEta, {105, 0, 21, 62, 1.7, 4.5, 50, 0, 100}}};
+    {kFT3TrackDeltaYVertexPtEta, {50, 0, 20, 28, 1.7, 4.5, 500, -500, 500}},
+    {kFT3TrackDeltaXVertexPtEta, {50, 0, 20, 28, 1.7, 4.5, 500, -500, 500}},
+    {kFT3TrackPtResolutionPtEta, {50, 0, 20, 28, 1.7, 4.5, 1000, -2, 50}},
+    {kFT3TrackXPullPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, 0, 0}},
+    {kFT3TrackYPullPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, 0, 0}},
+    {kFT3TrackPhiPullPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, -5, 5}},
+    {kFT3TrackTanlPullPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, -5, 5}},
+    {kFT3TrackInvQPtPullPtEta, {50, 0, 20, 28, 1.7, 4.5, 200, -5, 5}},
+    {kFT3TrackInvQPtResolutionPtEta, {50, 0, 20, 28, 1.7, 4.5, 100, 0, 0}},
+    {kFT3TrackInvPtResolutionPtEta, {50, 0, 20, 28, 1.7, 4.5, 2500, -5, 150}},
+    {kFT3TrackReducedChi2PtEta, {50, 0, 20, 28, 1.7, 4.5, 50, 0, 100}}};
 
   std::map<int, const char*> TH3XaxisTitles{
     {kFT3TrackDeltaXVertexPtEta, "p_t"},
     {kFT3TrackDeltaYVertexPtEta, "p_t"},
-    {kFT3TrackPtResolutionPtEta, "p_t"},
+    {kFT3TrackXPullPtEta, "p_t"},
+    {kFT3TrackYPullPtEta, "p_t"},
+    {kFT3TrackPhiPullPtEta, "p_t"},
+    {kFT3TrackTanlPullPtEta, "p_t"},
     {kFT3TrackInvQPtPullPtEta, "p_t"},
+    {kFT3TrackReducedChi2PtEta, "p_t"},
     {kFT3TrackInvQPtResolutionPtEta, "p_t"},
     {kFT3TrackInvPtResolutionPtEta, "p_t"}};
 
@@ -199,7 +203,12 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
     {kFT3TrackDeltaXVertexPtEta, "\\eta"},
     {kFT3TrackDeltaYVertexPtEta, "\\eta"},
     {kFT3TrackPtResolutionPtEta, "\\eta"},
+    {kFT3TrackXPullPtEta, "\\eta"},
+    {kFT3TrackYPullPtEta, "\\eta"},
+    {kFT3TrackPhiPullPtEta, "\\eta"},
+    {kFT3TrackTanlPullPtEta, "\\eta"},
     {kFT3TrackInvQPtPullPtEta, "\\eta"},
+    {kFT3TrackReducedChi2PtEta, "\\eta"},
     {kFT3TrackInvQPtResolutionPtEta, "\\eta"},
     {kFT3TrackInvPtResolutionPtEta, "\\eta"}};
 
@@ -207,7 +216,12 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
     {kFT3TrackDeltaXVertexPtEta, "X residual at vertex (um)"},
     {kFT3TrackDeltaYVertexPtEta, "Y residual at vertex (um)"},
     {kFT3TrackPtResolutionPtEta, "(p_t residual)/pt"},
+    {kFT3TrackXPullPtEta, "\\Delta X/\\sigma_{X}"},
+    {kFT3TrackYPullPtEta, "\\Delta Y/\\sigma_{Y}"},
+    {kFT3TrackPhiPullPtEta, "\\Delta \\phi/\\sigma_{\\phi}"},
+    {kFT3TrackTanlPullPtEta, "\\Delta tan\\lambda/\\sigma_{tan\\lambda}"},
     {kFT3TrackInvQPtPullPtEta, "(\\Delta q/p_t)/\\sigma_{q/pt}"},
+    {kFT3TrackReducedChi2PtEta, "\\chi^2/d.f."},
     {kFT3TrackInvQPtResolutionPtEta, "(q/p_t residual)/(q/pt)"},
     {kFT3TrackInvPtResolutionPtEta, "(1/p_t residual)/(1/pt)"}};
 
@@ -1240,6 +1254,78 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
       exportHisto(*h);
   }
 
+  vector<double> ptList({1. ,5. , 10., 15., 18.8});
+  double ptWindow = 1.2;
+  vector<double> etaList({2.5, 2.8, 3.1, 3.4});
+  double etaWindow = 0.2;
+
+  th1Hists_vsEtaPt("DeltaXVertexVsEta",TH3Histos[kFT3TrackDeltaXVertexPtEta],ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("DeltaXVertexVsPt",TH3Histos[kFT3TrackDeltaXVertexPtEta],etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c1x_eta = (TCanvas*)gDirectory->Get("DeltaXVertexVsEta");
+  TCanvas *c1x_pt = (TCanvas*)gDirectory->Get("DeltaXVertexVsPt");
+
+  th1Hists_vsEtaPt("DeltaYVertexVsEta",TH3Histos[kFT3TrackDeltaYVertexPtEta],ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("DeltaYVertexVsPt",TH3Histos[kFT3TrackDeltaYVertexPtEta],etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
+//  TCanvas *c1y_eta = (TCanvas*)gDirectory->Get("DeltaYVertexVsEta");
+//  TCanvas *c1y_pt = (TCanvas*)gDirectory->Get("DeltaYVertexVsPt");
+
+  th1Hists_vsEtaPt("XPullVsEta", TH3Histos[kFT3TrackXPullPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("XPullVsPt", TH3Histos[kFT3TrackXPullPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackXPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackXPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c2_eta = (TCanvas*)gDirectory->Get("XPullVsEta");
+  TCanvas *c2_pt = (TCanvas*)gDirectory->Get("XPullVsPt");
+
+  th1Hists_vsEtaPt("YPullVsEta", TH3Histos[kFT3TrackYPullPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("YPullVsPt", TH3Histos[kFT3TrackYPullPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackYPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackYPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+//  TCanvas *c3_eta = (TCanvas*)gDirectory->Get("YPullVsEta");
+//  TCanvas *c3_pt = (TCanvas*)gDirectory->Get("YPullVsPt");
+
+  th1Hists_vsEtaPt("InvQPtResVsEta", TH3Histos[kFT3TrackInvQPtResolutionPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("InvQPtResVsPt", TH3Histos[kFT3TrackInvQPtResolutionPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c3_eta = (TCanvas*)gDirectory->Get("InvQPtResVsEta");
+  TCanvas *c3_pt = (TCanvas*)gDirectory->Get("InvQPtResVsPt");
+
+
+  th1Hists_vsEtaPt("PhiPullVsEta", TH3Histos[kFT3TrackPhiPullPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("PhiPullVsPt", TH3Histos[kFT3TrackPhiPullPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackPhiPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackPhiPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c4_eta = (TCanvas*)gDirectory->Get("PhiPullVsEta");
+  TCanvas *c4_pt = (TCanvas*)gDirectory->Get("PhiPullVsPt");
+
+  th1Hists_vsEtaPt("TanlPullVsEta", TH3Histos[kFT3TrackTanlPullPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("TanlPullVsPt", TH3Histos[kFT3TrackTanlPullPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackTanlPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackTanlPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c5_eta = (TCanvas*)gDirectory->Get("TanlPullVsEta");
+  TCanvas *c5_pt = (TCanvas*)gDirectory->Get("TanlPullVsPt");
+
+  th1Hists_vsEtaPt("InvQPtPullVsEta", TH3Histos[kFT3TrackInvQPtPullPtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("InvQPtPullVsPt", TH3Histos[kFT3TrackInvQPtPullPtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackInvQPtPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackInvQPtPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
+  TCanvas *c6_eta = (TCanvas*)gDirectory->Get("InvQPtPullVsEta");
+  TCanvas *c6_pt = (TCanvas*)gDirectory->Get("InvQPtPullVsPt");
+
+  th1Hists_vsEtaPt("Redu_Chi2VsEta", TH3Histos[kFT3TrackReducedChi2PtEta], ptList, ptWindow, "_2");
+  th1Hists_vsEtaPt("Redu_Chi2VsPt", TH3Histos[kFT3TrackReducedChi2PtEta], etaList, etaWindow, "_2");
+    TH3Histos[kFT3TrackReducedChi2PtEta]->GetYaxis()->SetRangeUser(0, 0);
+    TH3Histos[kFT3TrackReducedChi2PtEta]->GetXaxis()->SetRangeUser(0, 0);
+
+  outFile.cd();
+  canvas_summary_3x2(c1x_eta,c2_eta,c4_eta,c3_eta,c6_eta,c5_eta,"Summary_Vs_Eta");
+  canvas_summary_3x2(c1x_pt,c2_pt,c4_pt,c3_pt,c6_pt,c5_pt,"Summary_Vs_Pt");
+
+  outFile.cd("MoreHistos");
   PtRes_Profile->Write();
   DeltaX_Profile->Write();
   DeltaX_Error->Write();
