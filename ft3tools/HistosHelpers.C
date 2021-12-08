@@ -5,6 +5,8 @@
 #include "TROOT.h"
 #include <TStyle.h>
 #include "TSystem.h"
+#include <TPaveText.h>
+#include <TLegend.h>
 
 
 #endif
@@ -404,8 +406,8 @@ summary_report_3x3(H1 &histo1, H2 &histo2, H3 &histo3, H4 &histo4, H5 &histo5,
 
   c1->Update();
   c1->Write();
-//  CanvasName += ".png";
-//  c1->Print(CanvasName.c_str());
+  CanvasName += ".png";
+  c1->Print(CanvasName.c_str());
   return c1;
 }
 
@@ -568,23 +570,27 @@ TCanvas summary_report_3x2(H1 &histo1, H2 &histo2, H3 &histo3, H4 &histo4,
 }
 
 //_________________________________________________________________________________________________
-void th1Hists_vsEtaPt(string name, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value) {
+void th1Hists_vsEtaPt(string cname, string ctitle, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value, float marker_size=0.7) {
 
-  auto canva = new TCanvas(name.c_str(), name.c_str(), 1080, 1080);
+  auto canva = new TCanvas(cname.c_str(), ctitle.c_str(), 1080, 1080);
   int marker = kFullCircle;
   int colormarker = 1;
-  gStyle->SetOptTitle(0);
+
   Hist3DDBG->GetYaxis()->SetRange(0, 0);
   Hist3DDBG->GetXaxis()->SetRange(0, 0);
-  if (name.find("VsEta")<50) {
+
+  if (cname.find("VsEta")<50) {
     marker = kFullCircle;
     for (auto ptmin : list) {
       auto ptmax = ptmin + window;
       Hist3DDBG->GetXaxis()->SetRangeUser(ptmin, ptmax);
 
+      string ytitle = "\\sigma (";
+      ytitle += Hist3DDBG->GetZaxis()->GetTitle();
+      ytitle += ")";
       auto title = Form("_%1.2f_%1.2f_yz", ptmin, ptmax);
       auto aDBG = (TH2F*)Hist3DDBG->Project3D(title);
-//      aDBG->GetXaxis()->SetRangeUser(0, 0);
+      aDBG->GetXaxis()->SetRangeUser(0, 0);
 
       aDBG->FitSlicesX(0, 0, -1, 1);
       auto th1DBG = (TH1F*)gDirectory->Get((std::string(aDBG->GetName()) + value).c_str());
@@ -592,17 +598,25 @@ void th1Hists_vsEtaPt(string name, std::unique_ptr<TH3F>& Hist3DDBG, std::vector
       th1DBG->SetMarkerStyle(marker);
       if (colormarker == 5) colormarker ++;
       th1DBG->SetMarkerColor(colormarker);
+      th1DBG->SetMarkerSize(marker_size);
       th1DBG->SetLineColorAlpha(colormarker++,0.0);
       th1DBG->SetStats(0);
+      th1DBG->SetYTitle(ytitle.c_str());
+//      th1DBG->GetXaxis()->SetRangeUser(2.39, 3.6);
+//      th1DBG->SetEntryLabel(Form("MC_DBG: %1.2f < p_t < %1.2f", ptmin, ptmax));
+//      th1DBG->SetTitle("");
       th1DBG->Draw("same");
-      Hist3DDBG->GetXaxis()->SetRangeUser(0, 0);
     }
-  }else if (name.find("VsPt")<50) {
+  }else if (cname.find("VsPt")<50) {
     marker = kFullSquare;
+//  gPad->SetLogy(1);
     for (auto etamin:list) {
       auto etamax = etamin + window;
       Hist3DDBG->GetYaxis()->SetRangeUser(etamin, etamax);
 
+      string ytitle = "\\sigma (";
+      ytitle += Hist3DDBG->GetZaxis()->GetTitle();
+      ytitle += ")";
       auto title = Form("_%1.2f_%1.2f_xz", etamin, etamax);
       auto aDBG = (TH2F*)Hist3DDBG->Project3D(title);
 //      aDBG->GetXaxis()->SetRangeUser(0, 0);
@@ -614,31 +628,34 @@ void th1Hists_vsEtaPt(string name, std::unique_ptr<TH3F>& Hist3DDBG, std::vector
       th1DBG->SetMarkerStyle(marker);
       if (colormarker == 5) colormarker ++;
       th1DBG->SetMarkerColor(colormarker);
+      th1DBG->SetMarkerSize(marker_size);
       th1DBG->SetLineColorAlpha(colormarker++,0.0);
       th1DBG->SetStats(0);
+      th1DBG->SetYTitle(ytitle.c_str());
       th1DBG->Draw("same");
     }
   } else {
-    cout << " Could not made Histograms Vs Pt/Eta. Please check the name argument "; exit(1);
+    cout << " Could not made Histograms Vs Pt/Eta. Please check first argument (canvas name) "; exit(1);
   }
-  TPaveText *t = new TPaveText(0.2223748,0.9069355,0.7776252,0.965, "brNDC"); // left-up
-  t->SetBorderSize(0);
-  t->SetFillColor(gStyle->GetTitleFillColor());
-  t->AddText(name.c_str());
-  t->Draw();
+TPaveText *t = new TPaveText(0.2223748,0.9069355,0.7776252,0.965, "brNDC"); // left-up
+t->SetBorderSize(0);
+t->SetFillColor(gStyle->GetTitleFillColor());
+t->AddText(ctitle.c_str());
+t->Draw();
 
-  name += ".png";
+  cname += ".png";
+//  canva->SetTitle("titulo");
   canva->BuildLegend();
   canva->SetTicky();
   canva->SetGridy();
   canva->Write();
-//  canva->Print(name.c_str());
+  canva->Print(cname.c_str());
 
 }
 //_________________________________________________________________________________________________
 TCanvas canvas_summary_3x2(TCanvas* canvas1, TCanvas* canvas2, TCanvas* canvas3, TCanvas* canvas4,
                            TCanvas* canvas5, TCanvas* canvas6, std::string CanvasName) {
-
+                           
   // Create a canvas and divide it
   TCanvas *c1 = new TCanvas(CanvasName.c_str(), CanvasName.c_str(), 1920, 1080);
   c1->UseCurrentStyle();
@@ -667,7 +684,8 @@ TCanvas canvas_summary_3x2(TCanvas* canvas1, TCanvas* canvas2, TCanvas* canvas3,
   gPad->SetBottomMargin(0.15);
   gPad->SetRightMargin(0.10);
   canvas1->DrawClonePad();
-  gPad->SetLogy(canvas1);
+  gPad->SetLogy(1);
+  
   // New Pad
   bottomPad->cd(2);
   // pad->SetPad(0.33,0.66,0.66,.96);
@@ -691,7 +709,7 @@ TCanvas canvas_summary_3x2(TCanvas* canvas1, TCanvas* canvas2, TCanvas* canvas3,
   gPad->SetBottomMargin(0.15);
   // gPad->SetRightMargin(0.15);
   canvas4->DrawClonePad();
-
+  
   // New Pad
   bottomPad->cd(5);
   gPad->SetBottomMargin(0.15);
@@ -704,6 +722,69 @@ TCanvas canvas_summary_3x2(TCanvas* canvas1, TCanvas* canvas2, TCanvas* canvas3,
   gPad->SetBottomMargin(0.15);
   // gPad->SetLeftMargin(0.15);
   canvas6->DrawClonePad();
+
+  c1->cd();
+
+  c1->Update();
+  c1->Write();
+  return c1;
+}
+//_________________________________________________________________________________________________
+TCanvas canvas_summary_2x2(TCanvas* canvas1, TCanvas* canvas2, TCanvas* canvas3, TCanvas* canvas4,
+                           std::string CanvasName) {
+
+  // Create a canvas and divide it
+  TCanvas *c1 = new TCanvas(CanvasName.c_str(), CanvasName.c_str(), 1920, 1080);
+  c1->UseCurrentStyle();
+
+  // gROOT->SetStyle("Bold");
+
+//std::string tlt = CanvasName.c_str();
+  TLatex Title = TLatex();
+  Title.SetTextSize(0.035);
+  Title.SetTextAlign(23);
+  Title.DrawLatex(.5, .995, CanvasName.c_str());
+  Title.Draw();
+
+  c1->Divide(1, 2);
+  TPad *topPad = (TPad *)c1->cd(1);
+  topPad->SetPad(0.000, 0.0, 1, .8);
+
+  TPad *bottomPad = (TPad *)c1->cd(2);
+  bottomPad->SetPad(0.000, 0.0, 1, .95);
+  bottomPad->Divide(2, 2, 0.005, 0.005);
+
+
+  // New Pad
+  bottomPad->cd(1);
+  // gPad->SetTopMargin(0.15);
+  gPad->SetBottomMargin(0.15);
+  gPad->SetRightMargin(0.10);
+  canvas1->DrawClonePad();
+
+  // New Pad
+  bottomPad->cd(2);
+  // pad->SetPad(0.33,0.66,0.66,.96);
+  gPad->SetBottomMargin(0.15);
+  // gPad->SetRightMargin(0.15);
+  // gPad->SetLeftMargin(0.15);
+  //  gPad->SetLogy(h2log);
+  canvas2->DrawClonePad();
+
+  // New Pad
+  bottomPad->cd(3);
+  // pad->SetPad(0.66,0.66,1,.96);
+  gPad->SetBottomMargin(0.15);
+  // gPad->SetRightMargin(0.15);
+  //  gPad->SetLogy(h3log);
+  canvas3->DrawClonePad();
+
+  // New Pad
+  bottomPad->cd(4);
+  // pad->SetPad(0.000,0.5,0.33,.96);
+  gPad->SetBottomMargin(0.15);
+  // gPad->SetRightMargin(0.15);
+  canvas4->DrawClonePad();
 
   c1->cd();
 
