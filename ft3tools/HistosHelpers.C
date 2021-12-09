@@ -570,7 +570,7 @@ TCanvas summary_report_3x2(H1 &histo1, H2 &histo2, H3 &histo3, H4 &histo4,
 }
 
 //_________________________________________________________________________________________________
-void th1Hists_vsEtaPt(string cname, string ctitle, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value, float marker_size=0.7) {
+void TH3HistoSlicer(string cname, string ctitle, std::unique_ptr<TH3F>& Hist3DDBG, std::vector<double> list, double window, string value, float marker_size=0.7) {
 
   auto canva = new TCanvas(cname.c_str(), ctitle.c_str(), 1080, 1080);
   int marker = kFullCircle;
