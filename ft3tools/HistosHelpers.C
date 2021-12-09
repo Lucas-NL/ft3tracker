@@ -619,10 +619,9 @@ void th1Hists_vsEtaPt(string cname, string ctitle, std::unique_ptr<TH3F>& Hist3D
       ytitle += ")";
       auto title = Form("_%1.2f_%1.2f_xz", etamin, etamax);
       auto aDBG = (TH2F*)Hist3DDBG->Project3D(title);
-//      aDBG->GetXaxis()->SetRangeUser(0, 0);
+      aDBG->GetXaxis()->SetRangeUser(0, 0);
 
       aDBG->FitSlicesX(0, 0, -1, 1);
-//      cout << (double)gDirectory->Get((std::string(aDBG->GetName()) + value).c_str()); <<endl;
       auto th1DBG = (TH1F*)gDirectory->Get((std::string(aDBG->GetName()) + value).c_str());
       th1DBG->SetTitle(Form("MC_DBG: %1.2f < \\eta < %1.2f", etamin, etamax));
       th1DBG->SetMarkerStyle(marker);

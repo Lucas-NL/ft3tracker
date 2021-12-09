@@ -1258,7 +1258,7 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
       exportHisto(*h);
   }
 
-  vector<double> ptList({1. ,5. , 10., 15., 18.8});
+  vector<double> ptList({0.8, 4. , 10., 16., 18.8});
   double ptWindow = 1.2;
   vector<double> etaList({2.5, 2.8, 3.1, 3.4});
   double etaWindow = 0.2;
