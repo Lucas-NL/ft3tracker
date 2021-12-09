@@ -1264,65 +1264,65 @@ int FT3TrackerChecker(const Char_t* trkFile = "ft3tracks.root",
   double etaWindow = 0.2;
 
 
-  th1Hists_vsEtaPt("DeltaXVertexVsEta","DeltaXVertexVsEta",TH3Histos[kFT3TrackDeltaXVertexPtEta],ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("DeltaXVertexVsPt","DeltaXVertexVsPt",TH3Histos[kFT3TrackDeltaXVertexPtEta],etaList, etaWindow, "_2");
+  TH3HistoSlicer("DeltaXVertexVsEta","DeltaXVertexVsEta",TH3Histos[kFT3TrackDeltaXVertexPtEta],ptList, ptWindow, "_2");
+  TH3HistoSlicer("DeltaXVertexVsPt","DeltaXVertexVsPt",TH3Histos[kFT3TrackDeltaXVertexPtEta],etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackDeltaXVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c1x_eta = (TCanvas*)gDirectory->Get("DeltaXVertexVsEta");
   TCanvas *c1x_pt = (TCanvas*)gDirectory->Get("DeltaXVertexVsPt");
 
-  th1Hists_vsEtaPt("DeltaYVertexVsEta","DeltaYVertexVsEta",TH3Histos[kFT3TrackDeltaYVertexPtEta],ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("DeltaYVertexVsPt","DeltaYVertexVsPt",TH3Histos[kFT3TrackDeltaYVertexPtEta],etaList, etaWindow, "_2");
+  TH3HistoSlicer("DeltaYVertexVsEta","DeltaYVertexVsEta",TH3Histos[kFT3TrackDeltaYVertexPtEta],ptList, ptWindow, "_2");
+  TH3HistoSlicer("DeltaYVertexVsPt","DeltaYVertexVsPt",TH3Histos[kFT3TrackDeltaYVertexPtEta],etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackDeltaYVertexPtEta]->GetXaxis()->SetRangeUser(0, 0);
 //  TCanvas *c1y_eta = (TCanvas*)gDirectory->Get("DeltaYVertexVsEta");
 //  TCanvas *c1y_pt = (TCanvas*)gDirectory->Get("DeltaYVertexVsPt");
 
-  th1Hists_vsEtaPt("XPullVsEta","XPullVsEta", TH3Histos[kFT3TrackXPullPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("XPullVsPt","XPullVsPt", TH3Histos[kFT3TrackXPullPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("XPullVsEta","XPullVsEta", TH3Histos[kFT3TrackXPullPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("XPullVsPt","XPullVsPt", TH3Histos[kFT3TrackXPullPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackXPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackXPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c2_eta = (TCanvas*)gDirectory->Get("XPullVsEta");
   TCanvas *c2_pt = (TCanvas*)gDirectory->Get("XPullVsPt");
 
-  th1Hists_vsEtaPt("YPullVsEta","YPullVsEta", TH3Histos[kFT3TrackYPullPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("YPullVsPt","YPullVsPt", TH3Histos[kFT3TrackYPullPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("YPullVsEta","YPullVsEta", TH3Histos[kFT3TrackYPullPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("YPullVsPt","YPullVsPt", TH3Histos[kFT3TrackYPullPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackYPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackYPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
 //  TCanvas *c3_eta = (TCanvas*)gDirectory->Get("YPullVsEta");
 //  TCanvas *c3_pt = (TCanvas*)gDirectory->Get("YPullVsPt");
 
-  th1Hists_vsEtaPt("InvQPtResVsEta","InvQPtResVsEta", TH3Histos[kFT3TrackInvQPtResolutionPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("InvQPtResVsPt","InvQPtResVsPt", TH3Histos[kFT3TrackInvQPtResolutionPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("InvQPtResVsEta","InvQPtResVsEta", TH3Histos[kFT3TrackInvQPtResolutionPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("InvQPtResVsPt","InvQPtResVsPt", TH3Histos[kFT3TrackInvQPtResolutionPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackInvQPtResolutionPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c3_eta = (TCanvas*)gDirectory->Get("InvQPtResVsEta");
   TCanvas *c3_pt = (TCanvas*)gDirectory->Get("InvQPtResVsPt");
 
 
-  th1Hists_vsEtaPt("PhiPullVsEta","PhiPullVsEta", TH3Histos[kFT3TrackPhiPullPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("PhiPullVsPt","PhiPullVsPt", TH3Histos[kFT3TrackPhiPullPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("PhiPullVsEta","PhiPullVsEta", TH3Histos[kFT3TrackPhiPullPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("PhiPullVsPt","PhiPullVsPt", TH3Histos[kFT3TrackPhiPullPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackPhiPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackPhiPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c4_eta = (TCanvas*)gDirectory->Get("PhiPullVsEta");
   TCanvas *c4_pt = (TCanvas*)gDirectory->Get("PhiPullVsPt");
 
-  th1Hists_vsEtaPt("TanlPullVsEta","TanlPullVsEta", TH3Histos[kFT3TrackTanlPullPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("TanlPullVsPt","TanlPullVsPt", TH3Histos[kFT3TrackTanlPullPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("TanlPullVsEta","TanlPullVsEta", TH3Histos[kFT3TrackTanlPullPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("TanlPullVsPt","TanlPullVsPt", TH3Histos[kFT3TrackTanlPullPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackTanlPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackTanlPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c5_eta = (TCanvas*)gDirectory->Get("TanlPullVsEta");
   TCanvas *c5_pt = (TCanvas*)gDirectory->Get("TanlPullVsPt");
 
-  th1Hists_vsEtaPt("InvQPtPullVsEta","InvQPtPullVsEta", TH3Histos[kFT3TrackInvQPtPullPtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("InvQPtPullVsPt","InvQPtPullVsPt", TH3Histos[kFT3TrackInvQPtPullPtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("InvQPtPullVsEta","InvQPtPullVsEta", TH3Histos[kFT3TrackInvQPtPullPtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("InvQPtPullVsPt","InvQPtPullVsPt", TH3Histos[kFT3TrackInvQPtPullPtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackInvQPtPullPtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackInvQPtPullPtEta]->GetXaxis()->SetRangeUser(0, 0);
   TCanvas *c6_eta = (TCanvas*)gDirectory->Get("InvQPtPullVsEta");
   TCanvas *c6_pt = (TCanvas*)gDirectory->Get("InvQPtPullVsPt");
 
-  th1Hists_vsEtaPt("Redu_Chi2VsEta","Redu_Chi2VsEta", TH3Histos[kFT3TrackReducedChi2PtEta], ptList, ptWindow, "_2");
-  th1Hists_vsEtaPt("Redu_Chi2VsPt","Redu_Chi2VsPt", TH3Histos[kFT3TrackReducedChi2PtEta], etaList, etaWindow, "_2");
+  TH3HistoSlicer("Redu_Chi2VsEta","Redu_Chi2VsEta", TH3Histos[kFT3TrackReducedChi2PtEta], ptList, ptWindow, "_2");
+  TH3HistoSlicer("Redu_Chi2VsPt","Redu_Chi2VsPt", TH3Histos[kFT3TrackReducedChi2PtEta], etaList, etaWindow, "_2");
     TH3Histos[kFT3TrackReducedChi2PtEta]->GetYaxis()->SetRangeUser(0, 0);
     TH3Histos[kFT3TrackReducedChi2PtEta]->GetXaxis()->SetRangeUser(0, 0);
 
